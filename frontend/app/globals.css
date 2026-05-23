@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cad-dark: #0a0e17;
+  --cad-panel: #111827;
+  --cad-border: #1e293b;
+  --cad-accent: #00d4ff;
+  --cad-accent2: #ff6b35;
+  --cad-text: #e2e8f0;
+  --cad-muted: #64748b;
+}
+
+body {
+  background-color: var(--cad-dark);
+  color: var(--cad-text);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cad-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cad-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cad-muted);
+}
+
+/* Glow effects */
+.glow-accent {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+}
+.glow-accent2 {
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.15);
+}
+
+/* Grid overlay for 3D viewer background */
+.viewer-grid {
+  background-image:
+    linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px;
+}

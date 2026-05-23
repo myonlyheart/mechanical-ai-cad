@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+backend/exports/*.stl
+backend/exports/*.step
+backend/exports/*.obj
+backend/renders/*.png
+backend/database/*.db
+*.db-journal
+
+# Env (sensitive)
+.env.local
+.env.production
+
+# Large files and media
+*.pdf
+*.dwg
+*.png
+*.jpg
+*.jpeg
+*.csv
+quotes_output.*
+
+# Other projects (not part of CAD platform)
+cadlianxi/
+pdf_crops/
+pdf_images/
+pdf_thumbs/
+solidworks_parametric/
+freecad_parts_library/
+autocad_parametric.py
+autocad-parametric.skill.md
+solidworks_parametric.py
+solidworks-parametric.skill.md
+sw_asm_diag.py
+project_summary_ppt.py
+flange_params.json
+gear_2d_*.dwg
