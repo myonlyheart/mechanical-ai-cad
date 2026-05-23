@@ -29,6 +29,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://localhost:3001",
         "https://cad.myonlyheart.xyz",
+        "https://frontend-12lwc0cwm-myheart-s-projects.vercel.app",
         "https://frontend-kappa-henna-67.vercel.app",
         "https://mechanical-ai-cad-myheart-s-projects.vercel.app",
     ],
