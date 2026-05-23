@@ -1,7 +1,7 @@
 """Hole utility functions for CAD parts."""
 
 from build123d import (
-    BuildPart, BuildSketch, Circle, Slot,
+    BuildPart, BuildSketch, Circle, Rectangle,
     extrude, Location, Vector, Rotation, Mode,
 )
 
@@ -40,10 +40,10 @@ def add_countersink(part, location, hole_diameter, cs_diameter, total_depth):
 
 
 def add_slot(part, location, width, length, depth, mode=Mode.SUBTRACT):
-    """Add a slot feature."""
+    """Add a slot feature using a rectangle."""
     with BuildPart(part, mode=mode) as slot:
         with BuildSketch(Location(location)) as ss:
-            Slot(width, length)
+            Rectangle(width, length)
         extrude(amount=depth, mode=mode)
     return part
 

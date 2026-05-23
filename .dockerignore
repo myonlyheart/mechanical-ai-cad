@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.venv/
+__pycache__/
+*.pyc
+.git/
+*.stl
+*.step
+*.obj
+backend/exports/
+backend/renders/
+backend/database/*.db
+frontend/node_modules/
+frontend/.next/
+.vercel
