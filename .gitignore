@@ -1,54 +1,72 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-dist/
-build/
-.eggs/
-*.egg
-.venv/
-venv/
-env/
-
-# Node
+# ==========================
+# Node.js
+# ==========================
 node_modules/
 .next/
 out/
-*.tsbuildinfo
+dist/
+build/
 
+# ==========================
+# Python
+# ==========================
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# ==========================
+# Environment
+# ==========================
+.env
+.env.local
+.env.production
+
+# ==========================
+# Logs
+# ==========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ==========================
+# Database
+# ==========================
+*.db
+*.sqlite3
+*.db-journal
+
+# ==========================
+# CAD Exports
+# ==========================
+backend/exports/
+backend/renders/
+*.stl
+*.step
+*.obj
+
+# ==========================
 # IDE
+# ==========================
 .vscode/
 .idea/
 *.swp
 *.swo
 
+# ==========================
 # OS
+# ==========================
 .DS_Store
 Thumbs.db
 
-# Project specific
-backend/exports/*.stl
-backend/exports/*.step
-backend/exports/*.obj
-backend/renders/*.png
-backend/database/*.db
-*.db-journal
-
-# Env (sensitive)
-.env.local
-.env.production
-
-# Large files and media
-*.pdf
-*.dwg
-*.png
-*.jpg
-*.jpeg
-*.csv
-quotes_output.*
-
-# Other projects (not part of CAD platform)
+# ==========================
+# Other projects
+# ==========================
 cadlianxi/
 pdf_crops/
 pdf_images/
@@ -63,3 +81,19 @@ sw_asm_diag.py
 project_summary_ppt.py
 flange_params.json
 gear_2d_*.dwg
+
+# ==========================
+# Large media
+# ==========================
+*.pdf
+*.dwg
+*.png
+*.jpg
+*.jpeg
+*.csv
+quotes_output.*
+
+# ==========================
+# Vercel
+# ==========================
+.vercel
