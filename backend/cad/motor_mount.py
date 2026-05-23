@@ -3,15 +3,14 @@
 from dataclasses import dataclass
 from build123d import (
     BuildPart, BuildSketch, Circle, Rectangle, extrude,
-    Axis, Location, Vector, Rotation, Pos,
-    Mode, Kind, fillet, chamfer,
+    Location, Pos,
+    Mode, fillet,
 )
 from .base_part import BasePart, PartParams
 
 
 @dataclass
 class NEMA17MountParams(PartParams):
-    """Parameters for NEMA17 motor mount."""
     base_length: float = 60
     base_width: float = 60
     base_thickness: float = 5
@@ -23,8 +22,6 @@ class NEMA17MountParams(PartParams):
 
 
 class NEMA17Mount(BasePart):
-    """NEMA17 stepper motor mounting plate."""
-
     def __init__(self, params: NEMA17MountParams):
         super().__init__(params)
         self.params = params
@@ -32,46 +29,41 @@ class NEMA17Mount(BasePart):
     def build(self):
         p = self.params
         half_spacing = p.motor_hole_spacing / 2
+        base_depth = p.base_thickness + p.mount_height
 
         with BuildPart() as part:
             # Base plate
-            with BuildSketch() as base_sketch:
+            with BuildSketch():
                 Rectangle(p.base_length, p.base_width)
             extrude(amount=p.base_thickness)
 
             # Vertical mount plate
-            with BuildSketch(Location((0, -p.base_width / 2, p.base_thickness))) as vert_sketch:
+            with BuildSketch(Pos(0, -p.base_width / 2, 0)):
                 Rectangle(p.base_length, p.mount_height)
             extrude(amount=-p.base_thickness)
 
-            # Center bore for motor shaft
-            with BuildPart(part.part, mode=Mode.SUBTRACT) as bore:
-                with BuildSketch(Location((0, -p.base_width / 2 + p.mount_height / 2, 0))) as cs:
+            # Center bore
+            bore_y = -p.base_width / 2 + p.mount_height / 2
+            with BuildPart(mode=Mode.SUBTRACT):
+                with BuildSketch(Pos(0, bore_y, 0)):
                     Circle(p.center_bore / 2)
-                extrude(amount=p.base_thickness, mode=Mode.SUBTRACT)
+                extrude(amount=base_depth * 2, both=True)
 
-            # Motor mounting holes (4 corners)
-            with BuildPart(part.part, mode=Mode.SUBTRACT) as motor_holes:
-                hole_loc = Location((0, -p.base_width / 2 + p.mount_height / 2, 0))
-                for dx, dy in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
-                    x = dx * half_spacing
-                    y = -p.base_width / 2 + p.mount_height / 2 + dy * half_spacing
-                    with BuildSketch(Location((x, y, 0))) as hs:
+            # Motor mounting holes
+            for dx, dy in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:
+                x = dx * half_spacing
+                y = bore_y + dy * half_spacing
+                with BuildPart(mode=Mode.SUBTRACT):
+                    with BuildSketch(Pos(x, y, 0)):
                         Circle(p.mounting_hole_diameter / 2)
-                    extrude(amount=p.base_thickness, mode=Mode.SUBTRACT)
+                    extrude(amount=base_depth * 2, both=True)
 
             # Base mounting holes
-            with BuildPart(part.part, mode=Mode.SUBTRACT) as base_holes:
-                for x_offset in [-p.base_length / 3, p.base_length / 3]:
-                    for y_offset in [-p.base_width / 3, p.base_width / 3]:
-                        with BuildSketch(Location((x_offset, y_offset, 0))) as hs:
+            for x_off in [-p.base_length / 3, p.base_length / 3]:
+                for y_off in [-p.base_width / 3, p.base_width / 3]:
+                    with BuildPart(mode=Mode.SUBTRACT):
+                        with BuildSketch(Pos(x_off, y_off, 0)):
                             Circle(p.base_hole_diameter / 2)
-                        extrude(amount=p.base_thickness, mode=Mode.SUBTRACT)
-
-            # Fillet
-            try:
-                fillet(part.part.edges(), 1.5)
-            except Exception:
-                pass
+                        extrude(amount=base_depth * 2, both=True)
 
         return part.part
