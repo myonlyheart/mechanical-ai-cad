@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "mechanical-ai-cad",
+  "regions": ["hkg1"],
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://api.myonlyheart.xyz/:path*"
+    },
+    {
+      "source": "/exports/:path*",
+      "destination": "https://api.myonlyheart.xyz/exports/:path*"
+    }
+  ]
+}
