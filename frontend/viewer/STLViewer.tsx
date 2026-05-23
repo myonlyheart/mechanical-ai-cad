@@ -1,8 +1,8 @@
 'use client';
 
 import { Suspense, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, useLoader } from '@react-three/drei';
+import { Canvas, useLoader } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 
