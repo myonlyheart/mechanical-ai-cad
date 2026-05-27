@@ -709,3 +709,20 @@ async def gear_drive_endpoint(request: dict):
 
     result = auto_select_gears(target_ratio, module, min_teeth, max_teeth, max_stages)
     return result.to_dict()
+
+
+# ============================================================
+# 工程语义校验
+# ============================================================
+
+@router.post("/validate/engineering")
+async def validate_engineering_endpoint(request: dict):
+    """工程语义校验 API
+
+    请求体: {"parts": [{"name": "g1", "part_type": "gear", "params": {"module": 2, ...}}, ...]}
+    """
+    from ..engineering.validation import validate_assembly
+
+    parts = request.get("parts", [])
+    result = validate_assembly(parts)
+    return result.to_dict()

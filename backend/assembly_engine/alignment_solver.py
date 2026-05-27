@@ -34,6 +34,30 @@ ASSEMBLY_RULES_TEMPLATES = {
     ("gear", "shaft"): [
         AlignmentRule("shaft_center", "gear", "shaft", "bore", "shaft_body"),
     ],
+    ("gear", "gear"): [
+        AlignmentRule("shaft_center", "gear", "gear", "gear_center", "gear_center"),
+    ],
+    ("bearing", "bearing_block"): [
+        AlignmentRule("shaft_center", "bearing", "bearing_block", "outer_race", "housing_bore"),
+    ],
+    ("shaft", "bearing_block"): [
+        AlignmentRule("shaft_center", "shaft", "bearing_block", "shaft_body", "bearing_axis"),
+    ],
+    ("bolt", "washer"): [
+        AlignmentRule("shaft_center", "bolt", "washer", "shaft_axis", "center_axis"),
+    ],
+    ("bolt", "nut"): [
+        AlignmentRule("shaft_center", "bolt", "nut", "shaft_axis", "thread_axis"),
+    ],
+    ("coupling", "shaft"): [
+        AlignmentRule("shaft_center", "coupling", "shaft", "axis", "shaft_body"),
+    ],
+    ("shaft_sleeve", "shaft"): [
+        AlignmentRule("shaft_center", "shaft_sleeve", "shaft", "axis", "shaft_body"),
+    ],
+    ("flange", "shaft"): [
+        AlignmentRule("shaft_center", "flange", "shaft", "center_axis", "shaft_body"),
+    ],
 }
 
 

@@ -69,8 +69,50 @@ def generate_assembly_code(assembly: dict) -> str:
             lines.append(f'parts["{name}"] = NEMA17Mount(params_{name}).build()')
         elif ptype == "gear":
             lines.append(f'# {name} - 齿轮')
-            lines.append(f'params_{name} = SpurGearParams(**{json.dumps(params)})')
-            lines.append(f'parts["{name}"] = SpurGear(params_{name}).build()')
+            lines.append(f'from components.gears import Gear, GearParams')
+            lines.append(f'params_{name} = GearParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Gear(params_{name}).build()')
+        elif ptype == "bolt":
+            lines.append(f'# {name} - 螺栓')
+            lines.append(f'from components.fasteners import Bolt, BoltParams')
+            lines.append(f'params_{name} = BoltParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Bolt(params_{name}).build()')
+        elif ptype == "nut":
+            lines.append(f'# {name} - 螺母')
+            lines.append(f'from components.fasteners import Nut, NutParams')
+            lines.append(f'params_{name} = NutParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Nut(params_{name}).build()')
+        elif ptype == "washer":
+            lines.append(f'# {name} - 垫片')
+            lines.append(f'from components.fasteners import Washer, WasherParams')
+            lines.append(f'params_{name} = WasherParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Washer(params_{name}).build()')
+        elif ptype == "shaft":
+            lines.append(f'# {name} - 轴')
+            lines.append(f'from components.shafts import Shaft, ShaftParams')
+            lines.append(f'params_{name} = ShaftParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Shaft(params_{name}).build()')
+        elif ptype == "bearing":
+            lines.append(f'# {name} - 轴承')
+            lines.append(f'from components.bearings import Bearing, BearingParams')
+            lines.append(f'params_{name} = BearingParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Bearing(params_{name}).build()')
+        elif ptype == "bearing_block":
+            lines.append(f'# {name} - 轴承座')
+            lines.append(f'params_{name} = BearingBlockParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = BearingBlock(params_{name}).build()')
+        elif ptype == "flange":
+            lines.append(f'# {name} - 法兰')
+            lines.append(f'params_{name} = FlangeParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Flange(params_{name}).build()')
+        elif ptype == "coupling":
+            lines.append(f'# {name} - 联轴器')
+            lines.append(f'params_{name} = CouplingParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = Coupling(params_{name}).build()')
+        elif ptype == "shaft_sleeve":
+            lines.append(f'# {name} - 轴套')
+            lines.append(f'params_{name} = ShaftSleeveParams(**{json.dumps(params)})')
+            lines.append(f'parts["{name}"] = ShaftSleeve(params_{name}).build()')
         else:
             lines.append(f'# {name} - {ptype}（未知类型，跳过）')
 

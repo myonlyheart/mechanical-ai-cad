@@ -17,6 +17,12 @@ from .collision import (
     compute_aabb, check_collision_pair,
     check_assembly_collisions, check_hole_overlap,
 )
+from .engineering import (
+    EngineeringIssue, EngineeringValidationResult,
+    validate_assembly,
+    check_gear_module_match, check_gear_center_distance, check_gear_min_teeth,
+    check_shaft_bearing_fit, check_bearing_housing_fit, check_bolt_hole_fit,
+)
 
 __all__ = [
     "ValidationError", "GeometryValidationResult", "validate_geometry",
@@ -27,4 +33,7 @@ __all__ = [
     "check_overhang_angle", "check_draft_angle",
     "AABB", "CollisionResult", "compute_aabb", "check_collision_pair",
     "check_assembly_collisions", "check_hole_overlap",
+    "EngineeringIssue", "EngineeringValidationResult", "validate_assembly",
+    "check_gear_module_match", "check_gear_center_distance", "check_gear_min_teeth",
+    "check_shaft_bearing_fit", "check_bearing_housing_fit", "check_bolt_hole_fit",
 ]
