@@ -20,6 +20,7 @@ from ..cad import (
     export_stl, export_step,
 )
 from ..components.fasteners import Bolt, BoltParams, Nut, NutParams, Washer, WasherParams
+from ..components.shafts import Shaft, ShaftParams
 
 router = APIRouter()
 prompt_engine = PromptEngine()
@@ -154,6 +155,19 @@ params = WasherParams(
 washer = Washer(params)
 part = washer.build()
 '''
+    elif part_type == "shaft":
+        return f'''from build123d import *
+from components.shafts import Shaft, ShaftParams
+
+params = ShaftParams(
+    diameter={params.get("diameter", 8)},
+    length={params.get("length", 120)},
+    shaft_type="{params.get("shaft_type", "round")}",
+    keyway_width={params.get("keyway_width", 0)},
+)
+shaft = Shaft(params)
+part = shaft.build()
+'''
     return "# 不支持的零件类型"
 
 
@@ -188,6 +202,9 @@ def build_part(part_type: str, params: dict):
     elif part_type == "washer":
         p = WasherParams(**{k: v for k, v in params.items() if hasattr(WasherParams, k)})
         return Washer(p).build()
+    elif part_type == "shaft":
+        p = ShaftParams(**{k: v for k, v in params.items() if hasattr(ShaftParams, k)})
+        return Shaft(p).build()
     raise ValueError(f"不支持的零件类型: {part_type}")
 
 
@@ -627,3 +644,26 @@ async def fastener_auto_assembly_endpoint(request: dict):
 
     result = auto_fasten(anchors, plate_thickness, preferred_diameter=bolt_d)
     return result.to_dict()
+
+
+# ============================================================
+# 轴系统
+# ============================================================
+
+@router.post("/shafts/fit")
+async def shaft_fit_endpoint(request: dict):
+    """轴配合查询 API
+
+    请求体: {"shaft_diameter": 8, "fit_type": "H7/k6", "purpose": "shaft|bearing|gear", "bearing_series": "6205", "gear_module": 2}
+    """
+    from ..components.shafts import get_shaft_fit, get_bearing_fit, get_gear_fit
+
+    shaft_d = request.get("shaft_diameter", 8)
+    purpose = request.get("purpose", "shaft")
+
+    if purpose == "bearing":
+        return get_bearing_fit(shaft_d, request.get("bearing_series", ""))
+    elif purpose == "gear":
+        return get_gear_fit(shaft_d, request.get("gear_module", 0))
+    else:
+        return get_shaft_fit(shaft_d, request.get("fit_type", "H7/k6"))

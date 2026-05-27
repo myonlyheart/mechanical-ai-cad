@@ -25,6 +25,7 @@ const PART_TYPE_NAMES: Record<string, string> = {
   bolt: '螺栓',
   nut: '螺母',
   washer: '垫片',
+  shaft: '轴',
 };
 
 interface GenerationResult {
@@ -356,6 +357,8 @@ export default function Home() {
                   '生成M6六角螺栓，长度20mm',
                   '做一个M8内六角螺钉',
                   '设计一个M6法兰螺母',
+                  '设计一个直径8mm的键槽轴',
+                  '生成一个台阶轴，12-8-6mm三段',
                 ].map((example, i) => (
                   <button
                     key={i}
