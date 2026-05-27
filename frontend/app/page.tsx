@@ -22,6 +22,9 @@ const PART_TYPE_NAMES: Record<string, string> = {
   flange: '法兰',
   coupling: '联轴器',
   shaft_sleeve: '轴套',
+  bolt: '螺栓',
+  nut: '螺母',
+  washer: '垫片',
 };
 
 interface GenerationResult {
@@ -350,6 +353,9 @@ export default function Home() {
                   '生成一个外径80的圆法兰，6个螺栓孔',
                   '做一个内径8的弹性联轴器',
                   '设计一个带凸缘和键槽的轴套',
+                  '生成M6六角螺栓，长度20mm',
+                  '做一个M8内六角螺钉',
+                  '设计一个M6法兰螺母',
                 ].map((example, i) => (
                   <button
                     key={i}

@@ -19,6 +19,7 @@ from ..cad import (
     ShaftSleeve, ShaftSleeveParams,
     export_stl, export_step,
 )
+from ..components.fasteners import Bolt, BoltParams, Nut, NutParams, Washer, WasherParams
 
 router = APIRouter()
 prompt_engine = PromptEngine()
@@ -118,6 +119,41 @@ params = ShaftSleeveParams(
 sleeve = ShaftSleeve(params)
 part = sleeve.build()
 '''
+    elif part_type == "bolt":
+        return f'''from build123d import *
+from components.fasteners import Bolt, BoltParams
+
+params = BoltParams(
+    diameter={params.get("diameter", 6)},
+    length={params.get("length", 20)},
+    head_type="{params.get("head_type", "hex")}",
+)
+bolt = Bolt(params)
+part = bolt.build()
+'''
+    elif part_type == "nut":
+        return f'''from build123d import *
+from components.fasteners import Nut, NutParams
+
+params = NutParams(
+    diameter={params.get("diameter", 6)},
+    nut_type="{params.get("nut_type", "hex")}",
+)
+nut = Nut(params)
+part = nut.build()
+'''
+    elif part_type == "washer":
+        return f'''from build123d import *
+from components.fasteners import Washer, WasherParams
+
+params = WasherParams(
+    inner_diameter={params.get("inner_diameter", 6.5)},
+    outer_diameter={params.get("outer_diameter", 12)},
+    washer_type="{params.get("washer_type", "flat")}",
+)
+washer = Washer(params)
+part = washer.build()
+'''
     return "# 不支持的零件类型"
 
 
@@ -143,6 +179,15 @@ def build_part(part_type: str, params: dict):
     elif part_type == "shaft_sleeve":
         p = ShaftSleeveParams(**{k: v for k, v in params.items() if hasattr(ShaftSleeveParams, k)})
         return ShaftSleeve(p).build()
+    elif part_type == "bolt":
+        p = BoltParams(**{k: v for k, v in params.items() if hasattr(BoltParams, k)})
+        return Bolt(p).build()
+    elif part_type == "nut":
+        p = NutParams(**{k: v for k, v in params.items() if hasattr(NutParams, k)})
+        return Nut(p).build()
+    elif part_type == "washer":
+        p = WasherParams(**{k: v for k, v in params.items() if hasattr(WasherParams, k)})
+        return Washer(p).build()
     raise ValueError(f"不支持的零件类型: {part_type}")
 
 
@@ -538,3 +583,47 @@ async def dependency_check_endpoint(request: dict):
         "topological_order": graph.get_topological_order() if not graph.has_cycle() else [],
         "graph": graph.to_dict(),
     }
+
+
+# ============================================================
+# 紧固件系统
+# ============================================================
+
+@router.post("/fasteners/hole-match")
+async def hole_match_endpoint(request: dict):
+    """螺丝孔匹配 API
+
+    请求体: {"bolt_diameter": 6, "hole_type": "normal"}
+    """
+    from ..components.fasteners import get_hole_diameter, get_counterbore_dimensions, get_countersink_diameter
+
+    bolt_d = request.get("bolt_diameter", 6)
+    hole_type = request.get("hole_type", "normal")
+
+    return {
+        "bolt_diameter": bolt_d,
+        "hole_type": hole_type,
+        "hole_diameter": get_hole_diameter(bolt_d, hole_type),
+        "counterbore": get_counterbore_dimensions(bolt_d),
+        "countersink_diameter": get_countersink_diameter(bolt_d),
+    }
+
+
+@router.post("/fasteners/auto-assembly")
+async def fastener_auto_assembly_endpoint(request: dict):
+    """自动紧固件装配 API
+
+    请求体: {
+        "anchors": [{"name": "h1", "type": "hole_center", "diameter": 6.5, "position": [x,y,z]}],
+        "plate_thickness": 10,
+        "bolt_diameter": 0 (auto)
+    }
+    """
+    from ..components.fasteners import auto_fasten
+
+    anchors = request.get("anchors", [])
+    plate_thickness = request.get("plate_thickness", 10.0)
+    bolt_d = request.get("bolt_diameter", 0)
+
+    result = auto_fasten(anchors, plate_thickness, preferred_diameter=bolt_d)
+    return result.to_dict()

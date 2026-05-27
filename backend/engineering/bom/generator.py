@@ -109,6 +109,9 @@ def _generate_part_number(index: int, part_type: str) -> str:
         "coupling": "CPL",
         "shaftsleeve": "SLV",
         "shaft_sleeve": "SLV",
+        "bolt": "BOL",
+        "nut": "NUT",
+        "washer": "WSH",
     }
     prefix = prefix_map.get(part_type.lower(), "PRT")
     return f"{prefix}-{index:03d}"
