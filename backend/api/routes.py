@@ -805,3 +805,104 @@ async def rails_calculate_endpoint(request: dict):
             result["steps_per_mm"] = calculate_steps_per_mm(screw_name, 1.8, microstepping)
 
     return result
+
+
+# ============================================================
+# AI 机械依赖推理
+# ============================================================
+
+@router.post("/ai/reason")
+async def ai_reason_endpoint(request: dict):
+    """AI 机械依赖推理 - 给定零件推断完整依赖链。
+
+    请求体: {"part_type": "shaft", "params": {"diameter": 10, "length": 150}}
+    返回: 依赖图 + 自动选择的组件 + 校验结果 + BOM
+    """
+    from ..engineering.reasoning import reason_part
+
+    part_type = request.get("part_type", "")
+    params = request.get("params", {})
+    if not part_type:
+        raise HTTPException(status_code=400, detail="part_type is required")
+
+    return reason_part(part_type, params)
+
+
+@router.post("/ai/reason-assembly")
+async def ai_reason_assembly_endpoint(request: dict):
+    """AI 装配体依赖推理 - 多零件交叉校验。
+
+    请求体: {"parts": [{"part_type": "shaft", "name": "main", "params": {"diameter": 10}}, ...]}
+    返回: 依赖图 + 交叉校验结果
+    """
+    from ..engineering.reasoning import reason_assembly
+
+    parts = request.get("parts", [])
+    if not parts:
+        raise HTTPException(status_code=400, detail="parts list is required")
+
+    return reason_assembly(parts)
+
+
+@router.post("/ai/dependencies")
+async def ai_dependencies_endpoint(request: dict):
+    """查询零件类型的依赖规则。
+
+    请求体: {"part_type": "shaft"}
+    返回: 该零件类型的所有依赖规则
+    """
+    from ..engineering.reasoning import get_rules_for_source, get_rules_for_target, DEPENDENCY_RULES
+
+    part_type = request.get("part_type", "")
+    if not part_type:
+        # 返回所有规则
+        return {
+            "rules": [
+                {"name": r.name, "source": r.source_type, "target": r.target_type,
+                 "reason": r.reason, "param_mapping": r.param_mapping}
+                for r in DEPENDENCY_RULES
+            ]
+        }
+
+    source_rules = get_rules_for_source(part_type)
+    target_rules = get_rules_for_target(part_type)
+
+    return {
+        "part_type": part_type,
+        "depends_on": [
+            {"name": r.name, "target": r.target_type, "reason": r.reason,
+             "param_mapping": r.param_mapping}
+            for r in source_rules
+        ],
+        "depended_by": [
+            {"name": r.name, "source": r.source_type, "reason": r.reason,
+             "param_mapping": r.param_mapping}
+            for r in target_rules
+        ],
+    }
+
+
+@router.post("/ai/system")
+async def ai_system_endpoint(request: dict):
+    """AI 机械系统识别 - 从描述中识别系统类型并返回零件组合。
+
+    请求体: {"prompt": "3:1 减速器"}
+    返回: 系统模板 + 零件列表 + 约束
+    """
+    from ..engineering.reasoning import detect_system, list_systems
+
+    prompt = request.get("prompt", "")
+    if not prompt:
+        return {"systems": list_systems()}
+
+    template = detect_system(prompt)
+    if not template:
+        return {"detected": False, "prompt": prompt, "available_systems": list_systems()}
+
+    return {
+        "detected": True,
+        "system": template.name,
+        "description": template.description,
+        "parts": template.parts,
+        "constraints": template.constraints,
+    }

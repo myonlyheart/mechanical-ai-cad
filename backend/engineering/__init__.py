@@ -27,6 +27,12 @@ from .bom import (
     generate_bom_from_parts, generate_bom_from_assembly,
     bom_to_csv, save_bom_csv,
 )
+from .reasoning import (
+    MechanicalReasoningEngine, ReasoningResult,
+    reason_part, reason_assembly,
+    DEPENDENCY_RULES, validate_dependency,
+    detect_system, list_systems,
+)
 
 __all__ = [
     "Transform3D", "AssemblyNode", "AssemblyTree",
@@ -44,4 +50,8 @@ __all__ = [
     "BOM", "BOMItem",
     "generate_bom_from_parts", "generate_bom_from_assembly",
     "bom_to_csv", "save_bom_csv",
+    "MechanicalReasoningEngine", "ReasoningResult",
+    "reason_part", "reason_assembly",
+    "DEPENDENCY_RULES", "validate_dependency",
+    "detect_system", "list_systems",
 ]
