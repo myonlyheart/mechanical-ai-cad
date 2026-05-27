@@ -444,6 +444,44 @@ DESIGN_STRATEGIES = {
             "params_override": {"washer_type": "lock"},
         },
     ],
+    "motor": [
+        {
+            "id": "nema17_standard",
+            "name": "NEMA17 标准安装",
+            "description": "3D打印机常用NEMA17步进电机安装方案",
+            "weight_factor": 1.0,
+            "strength_factor": 1.0,
+            "time_factor": 1.0,
+            "params_override": {"motor_name": "NEMA17"},
+        },
+        {
+            "id": "nema23_heavy",
+            "name": "NEMA23 重型安装",
+            "description": "大扭矩NEMA23电机，加厚安装面",
+            "weight_factor": 1.4,
+            "strength_factor": 1.5,
+            "time_factor": 1.2,
+            "params_override": {"motor_name": "NEMA23", "base_thickness": 8},
+        },
+        {
+            "id": "775_dc_compact",
+            "name": "775电机紧凑安装",
+            "description": "775直流电机侧装方案",
+            "weight_factor": 0.8,
+            "strength_factor": 0.9,
+            "time_factor": 0.8,
+            "params_override": {"motor_name": "775"},
+        },
+        {
+            "id": "servo_mount",
+            "name": "舵机安装座",
+            "description": "SG90/MG996R舵机通用安装",
+            "weight_factor": 0.5,
+            "strength_factor": 0.7,
+            "time_factor": 0.6,
+            "params_override": {"motor_name": "MG996R"},
+        },
+    ],
 }
 
 # 载荷等级对应的系数

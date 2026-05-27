@@ -726,3 +726,82 @@ async def validate_engineering_endpoint(request: dict):
     parts = request.get("parts", [])
     result = validate_assembly(parts)
     return result.to_dict()
+
+
+# ============================================================
+# 电机系统
+# ============================================================
+
+@router.get("/motors/list")
+async def motors_list_endpoint(motor_type: str = ""):
+    """电机列表 API
+
+    Query参数: motor_type=stepper|dc|servo (可选)
+    """
+    from ..components.motors import list_motors
+    return {"motors": list_motors(motor_type)}
+
+
+@router.post("/motors/mount")
+async def motors_mount_endpoint(request: dict):
+    """电机安装座参数 API
+
+    请求体: {"motor_name": "NEMA17"}
+    """
+    from ..components.motors import get_mount_params
+
+    motor_name = request.get("motor_name", "")
+    return get_mount_params(motor_name)
+
+
+@router.post("/motors/coupling")
+async def motors_coupling_endpoint(request: dict):
+    """联轴器推荐 API
+
+    请求体: {"shaft_diameter": 8, "motor_name": "NEMA17"}
+    """
+    from ..components.motors import recommend_coupling
+
+    shaft_d = request.get("shaft_diameter", 8)
+    motor_name = request.get("motor_name", "")
+    return recommend_coupling(shaft_d, motor_name)
+
+
+# ============================================================
+# 线性运动系统
+# ============================================================
+
+@router.get("/rails/list")
+async def rails_list_endpoint():
+    """导轨列表 API"""
+    from ..components.rails import list_rails, list_screws
+    return {"rails": list_rails(), "screws": list_screws()}
+
+
+@router.post("/rails/calculate")
+async def rails_calculate_endpoint(request: dict):
+    """运动计算 API
+
+    请求体: {"rail_name": "MGN12", "rail_length": 300, "screw_name": "T8x8", "microstepping": 16}
+    """
+    from ..components.rails import get_rail_spec, get_screw_spec, calculate_travel, calculate_steps_per_mm
+
+    result = {}
+
+    rail_name = request.get("rail_name", "")
+    if rail_name:
+        spec = get_rail_spec(rail_name)
+        if spec:
+            rail_length = request.get("rail_length", 300)
+            result["rail"] = spec.to_dict()
+            result["travel"] = calculate_travel(rail_length, spec.block_length)
+
+    screw_name = request.get("screw_name", "")
+    if screw_name:
+        spec = get_screw_spec(screw_name)
+        if spec:
+            microstepping = request.get("microstepping", 16)
+            result["screw"] = spec.to_dict()
+            result["steps_per_mm"] = calculate_steps_per_mm(screw_name, 1.8, microstepping)
+
+    return result

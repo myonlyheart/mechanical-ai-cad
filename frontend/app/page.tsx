@@ -27,6 +27,7 @@ const PART_TYPE_NAMES: Record<string, string> = {
   washer: '垫片',
   shaft: '轴',
   bearing: '轴承',
+  motor: '电机',
 };
 
 interface GenerationResult {
@@ -364,6 +365,9 @@ export default function Home() {
                   '生成一个台阶轴，12-8-6mm三段',
                   '生成6205深沟球轴承',
                   '做一个8mm轴径的法兰轴承',
+                  '推荐一个NEMA17电机的安装座参数',
+                  '设计一个NEMA23电机加强型安装座',
+                  '做一个775电机紧凑安装支架',
                 ].map((example, i) => (
                   <button
                     key={i}
