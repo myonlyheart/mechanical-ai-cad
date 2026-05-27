@@ -6,6 +6,7 @@ from .solver import (
     Constraint, solve_constraint, parse_nl_constraints,
     solve_coincident, solve_parallel, solve_perpendicular,
     solve_distance, solve_angle, solve_tangent,
+    solve_gear_mesh, solve_slider, solve_rotational,
 )
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "Constraint", "solve_constraint", "parse_nl_constraints",
     "solve_coincident", "solve_parallel", "solve_perpendicular",
     "solve_distance", "solve_angle", "solve_tangent",
+    "solve_gear_mesh", "solve_slider", "solve_rotational",
 ]

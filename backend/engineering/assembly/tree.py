@@ -20,29 +20,77 @@ class Transform3D:
     """3D 变换矩阵（简化表示）。
 
     使用 position + rotation（四元数）+ scale 表示。
+    四元数格式: (x, y, z, w)
     """
     position: tuple[float, float, float] = (0.0, 0.0, 0.0)
     rotation: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 1.0)  # (x, y, z, w)
     scale: tuple[float, float, float] = (1.0, 1.0, 1.0)
 
     def apply_to_point(self, point: tuple[float, float, float]) -> tuple[float, float, float]:
-        """将变换应用到一个点（简化：仅平移）。"""
+        """将变换应用到一个点：先缩放，再旋转，最后平移。"""
+        # 1. 缩放
+        sx = point[0] * self.scale[0]
+        sy = point[1] * self.scale[1]
+        sz = point[2] * self.scale[2]
+
+        # 2. 四元数旋转: v' = q * v * q^-1
+        rx, ry, rz, rw = self.rotation
+        # 优化公式（避免完整四元数乘法）
+        # v' = v + 2 * q_xyz × (q_xyz × v + q_w * v)
+        tx = 2.0 * (ry * sz - rz * sy)
+        ty = 2.0 * (rz * sx - rx * sz)
+        tz = 2.0 * (rx * sy - ry * sx)
+        rx_out = sx + rw * tx + (ry * tz - rz * ty)
+        ry_out = sy + rw * ty + (rz * tx - rx * tz)
+        rz_out = sz + rw * tz + (rx * ty - ry * tx)
+
+        # 3. 平移
         return (
-            point[0] + self.position[0],
-            point[1] + self.position[1],
-            point[2] + self.position[2],
+            rx_out + self.position[0],
+            ry_out + self.position[1],
+            rz_out + self.position[2],
         )
 
     def multiply(self, other: Transform3D) -> Transform3D:
-        """组合两个变换（简化：仅组合平移）。"""
+        """组合两个变换：self * other（先应用 other，再应用 self）。
+
+        位置: p = self.pos + self.rot * (self.scale * other.pos)
+        旋转: q = self.rot * other.rot
+        缩放: s = self.scale * other.scale
+        """
+        # 四元数乘法: q1 * q2
+        ax, ay, az, aw = self.rotation
+        bx, by, bz, bw = other.rotation
+        new_rw = aw * bw - ax * bx - ay * by - az * bz
+        new_rx = aw * bx + ax * bw + ay * bz - az * by
+        new_ry = aw * by - ax * bz + ay * bw + az * bx
+        new_rz = aw * bz + ax * by - ay * bx + az * bw
+
+        # 缩放 other 的位置
+        ox = other.position[0] * self.scale[0]
+        oy = other.position[1] * self.scale[1]
+        oz = other.position[2] * self.scale[2]
+
+        # 用 self.rotation 旋转缩放后的位置
+        tx = 2.0 * (ay * oz - az * oy)
+        ty = 2.0 * (az * ox - ax * oz)
+        tz = 2.0 * (ax * oy - ay * ox)
+        rx_out = ox + aw * tx + (ay * tz - az * ty)
+        ry_out = oy + aw * ty + (az * tx - ax * tz)
+        rz_out = oz + aw * tz + (ax * ty - ay * tx)
+
         return Transform3D(
             position=(
-                self.position[0] + other.position[0],
-                self.position[1] + other.position[1],
-                self.position[2] + other.position[2],
+                self.position[0] + rx_out,
+                self.position[1] + ry_out,
+                self.position[2] + rz_out,
             ),
-            rotation=self.rotation,
-            scale=self.scale,
+            rotation=(new_rx, new_ry, new_rz, new_rw),
+            scale=(
+                self.scale[0] * other.scale[0],
+                self.scale[1] * other.scale[1],
+                self.scale[2] * other.scale[2],
+            ),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -59,6 +107,20 @@ class Transform3D:
     @classmethod
     def from_position(cls, x: float, y: float, z: float) -> Transform3D:
         return cls(position=(x, y, z))
+
+    @classmethod
+    def from_rotation(cls, rx: float, ry: float, rz: float) -> Transform3D:
+        """从欧拉角（弧度）创建旋转变换。"""
+        import math
+        # 欧拉角 → 四元数 (ZYX 顺序)
+        cx, sx = math.cos(rx / 2), math.sin(rx / 2)
+        cy, sy = math.cos(ry / 2), math.sin(ry / 2)
+        cz, sz = math.cos(rz / 2), math.sin(rz / 2)
+        w = cx * cy * cz + sx * sy * sz
+        x = sx * cy * cz - cx * sy * sz
+        y = cx * sy * cz + sx * cy * sz
+        z = cx * cy * sz - sx * sy * cz
+        return cls(rotation=(x, y, z, w))
 
 
 @dataclass

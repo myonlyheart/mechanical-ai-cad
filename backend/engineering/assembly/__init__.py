@@ -10,6 +10,7 @@ from .mate import (
     MateType, MateConstraint,
     create_coincident_mate, create_concentric_mate,
     create_parallel_mate, create_distance_mate,
+    create_gear_mesh_mate, create_slider_mate, create_rotational_mate,
     solve_mate, solve_mate_chain,
 )
 
@@ -21,5 +22,6 @@ __all__ = [
     "MateType", "MateConstraint",
     "create_coincident_mate", "create_concentric_mate",
     "create_parallel_mate", "create_distance_mate",
+    "create_gear_mesh_mate", "create_slider_mate", "create_rotational_mate",
     "solve_mate", "solve_mate_chain",
 ]
