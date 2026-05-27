@@ -13,6 +13,10 @@ from ..prompts import PromptEngine
 from ..cad import (
     LBracket, LBracketParams, TBracket, TBracketParams,
     SpurGear, SpurGearParams, NEMA17Mount, NEMA17MountParams,
+    BearingBlock, BearingBlockParams,
+    Flange, FlangeParams,
+    Coupling, CouplingParams,
+    ShaftSleeve, ShaftSleeveParams,
     export_stl, export_step,
 )
 
@@ -64,6 +68,56 @@ params = NEMA17MountParams(
 mount = NEMA17Mount(params)
 part = mount.build()
 '''
+    elif part_type == "bearing_block":
+        return f'''from build123d import *
+from cad import BearingBlock, BearingBlockParams
+
+params = BearingBlockParams(
+    base_length={params.get("base_length", 60)},
+    base_width={params.get("base_width", 40)},
+    bearing_diameter={params.get("bearing_diameter", 22)},
+    height={params.get("height", 30)},
+)
+block = BearingBlock(params)
+part = block.build()
+'''
+    elif part_type == "flange":
+        return f'''from build123d import *
+from cad import Flange, FlangeParams
+
+params = FlangeParams(
+    outer_diameter={params.get("outer_diameter", 80)},
+    bore_diameter={params.get("bore_diameter", 30)},
+    bolt_count={params.get("bolt_count", 6)},
+    thickness={params.get("thickness", 8)},
+)
+flange = Flange(params)
+part = flange.build()
+'''
+    elif part_type == "coupling":
+        return f'''from build123d import *
+from cad import Coupling, CouplingParams
+
+params = CouplingParams(
+    outer_diameter={params.get("outer_diameter", 30)},
+    length={params.get("length", 40)},
+    bore_diameter={params.get("bore_diameter", 8)},
+)
+coupling = Coupling(params)
+part = coupling.build()
+'''
+    elif part_type == "shaft_sleeve":
+        return f'''from build123d import *
+from cad import ShaftSleeve, ShaftSleeveParams
+
+params = ShaftSleeveParams(
+    outer_diameter={params.get("outer_diameter", 20)},
+    inner_diameter={params.get("inner_diameter", 12)},
+    length={params.get("length", 30)},
+)
+sleeve = ShaftSleeve(params)
+part = sleeve.build()
+'''
     return "# 不支持的零件类型"
 
 
@@ -77,6 +131,18 @@ def build_part(part_type: str, params: dict):
     elif part_type == "motor_mount":
         p = NEMA17MountParams(**{k: v for k, v in params.items() if hasattr(NEMA17MountParams, k)})
         return NEMA17Mount(p).build()
+    elif part_type == "bearing_block":
+        p = BearingBlockParams(**{k: v for k, v in params.items() if hasattr(BearingBlockParams, k)})
+        return BearingBlock(p).build()
+    elif part_type == "flange":
+        p = FlangeParams(**{k: v for k, v in params.items() if hasattr(FlangeParams, k)})
+        return Flange(p).build()
+    elif part_type == "coupling":
+        p = CouplingParams(**{k: v for k, v in params.items() if hasattr(CouplingParams, k)})
+        return Coupling(p).build()
+    elif part_type == "shaft_sleeve":
+        p = ShaftSleeveParams(**{k: v for k, v in params.items() if hasattr(ShaftSleeveParams, k)})
+        return ShaftSleeve(p).build()
     raise ValueError(f"不支持的零件类型: {part_type}")
 
 

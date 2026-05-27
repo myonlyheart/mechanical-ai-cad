@@ -103,6 +103,12 @@ def _generate_part_number(index: int, part_type: str) -> str:
         "motor": "MOT",
         "shaft": "SHF",
         "bearing": "BRG",
+        "bearingblock": "BRG",
+        "bearing_block": "BRG",
+        "flange": "FLG",
+        "coupling": "CPL",
+        "shaftsleeve": "SLV",
+        "shaft_sleeve": "SLV",
     }
     prefix = prefix_map.get(part_type.lower(), "PRT")
     return f"{prefix}-{index:03d}"
@@ -124,9 +130,9 @@ def _estimate_weight(params: dict[str, Any], part_type: str) -> float:
 
     # 简化体积估算
     thickness = params.get("thickness", params.get("base_thickness", 5))
-    length = params.get("length", params.get("base_length", 60))
-    width = params.get("width", params.get("base_width", 40))
-    height = params.get("height", params.get("mount_height", 40))
+    length = params.get("length", params.get("base_length", params.get("outer_diameter", 60)))
+    width = params.get("width", params.get("base_width", params.get("outer_diameter", 40)))
+    height = params.get("height", params.get("mount_height", params.get("flange_thickness", params.get("thickness", 40))))
 
     volume_cm3 = (length * width * height) / 1000  # mm³ → cm³
 

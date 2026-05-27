@@ -203,3 +203,125 @@ def t_bracket_anchors(
             direction=(0, 0, -1), diameter=hole_diameter,
         ),
     ]
+
+
+def bearing_block_anchors(
+    base_length: float = 60,
+    base_width: float = 40,
+    height: float = 30,
+    bearing_diameter: float = 22,
+    mounting_hole_spacing: float = 45,
+) -> list[Anchor]:
+    """轴承座默认锚点。"""
+    return [
+        create_axis_anchor(
+            "bearing_axis", position=(0, 0, height),
+            direction=(1, 0, 0), metadata={"description": "轴承轴线"},
+        ),
+        create_face_anchor(
+            "base_face", position=(0, 0, 0),
+            normal=(0, 0, -1), metadata={"description": "底座安装面"},
+        ),
+        create_hole_center_anchor(
+            "mount_hole_left", position=(-mounting_hole_spacing / 2, 0, 0),
+            direction=(0, 0, -1), diameter=5.0,
+        ),
+        create_hole_center_anchor(
+            "mount_hole_right", position=(mounting_hole_spacing / 2, 0, 0),
+            direction=(0, 0, -1), diameter=5.0,
+        ),
+    ]
+
+
+def flange_anchors(
+    outer_diameter: float = 80,
+    bore_diameter: float = 30,
+    thickness: float = 8,
+    bolt_circle_diameter: float = 68,
+    bolt_count: int = 6,
+    bolt_hole_diameter: float = 8,
+) -> list[Anchor]:
+    """法兰默认锚点。"""
+    import math
+    bolt_r = bolt_circle_diameter / 2
+    anchors = [
+        create_axis_anchor(
+            "center_axis", position=(0, 0, 0),
+            direction=(0, 0, 1), metadata={"description": "中心轴线"},
+        ),
+        create_face_anchor(
+            "face_front", position=(0, 0, thickness),
+            normal=(0, 0, 1), metadata={"description": "前端面"},
+        ),
+        create_face_anchor(
+            "face_back", position=(0, 0, 0),
+            normal=(0, 0, -1), metadata={"description": "后端面"},
+        ),
+    ]
+    for i in range(bolt_count):
+        angle = 2 * math.pi * i / bolt_count
+        x = bolt_r * math.cos(angle)
+        y = bolt_r * math.sin(angle)
+        anchors.append(create_hole_center_anchor(
+            f"bolt_hole_{i + 1}", position=(x, y, thickness / 2),
+            direction=(0, 0, 1), diameter=bolt_hole_diameter,
+        ))
+    return anchors
+
+
+def coupling_anchors(
+    outer_diameter: float = 30,
+    length: float = 40,
+    bore_diameter: float = 8,
+) -> list[Anchor]:
+    """联轴器默认锚点。"""
+    return [
+        create_axis_anchor(
+            "axis", position=(0, 0, 0),
+            direction=(0, 0, 1), metadata={"description": "中心轴线"},
+        ),
+        create_face_anchor(
+            "face_left", position=(0, 0, 0),
+            normal=(0, 0, -1), metadata={"description": "左端面"},
+        ),
+        create_face_anchor(
+            "face_right", position=(0, 0, length),
+            normal=(0, 0, 1), metadata={"description": "右端面"},
+        ),
+        create_hole_center_anchor(
+            "bore_left", position=(0, 0, 0),
+            direction=(0, 0, -1), diameter=bore_diameter,
+        ),
+        create_hole_center_anchor(
+            "bore_right", position=(0, 0, length),
+            direction=(0, 0, 1), diameter=bore_diameter,
+        ),
+    ]
+
+
+def shaft_sleeve_anchors(
+    outer_diameter: float = 20,
+    inner_diameter: float = 12,
+    length: float = 30,
+    flange_diameter: float = 28,
+    flange_thickness: float = 3,
+) -> list[Anchor]:
+    """轴套默认锚点。"""
+    return [
+        create_axis_anchor(
+            "axis", position=(0, 0, 0),
+            direction=(0, 0, 1), metadata={"description": "中心轴线"},
+        ),
+        create_face_anchor(
+            "face_front", position=(0, 0, flange_thickness + length),
+            normal=(0, 0, 1), metadata={"description": "前端面"},
+        ),
+        create_face_anchor(
+            "face_back", position=(0, 0, flange_thickness),
+            normal=(0, 0, -1), metadata={"description": "后端面（凸缘侧）"},
+        ),
+        create_face_anchor(
+            "flange_face", position=(0, 0, 0),
+            normal=(0, 0, -1), metadata={"description": "凸缘底面"},
+        ),
+    ]

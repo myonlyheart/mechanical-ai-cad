@@ -18,6 +18,10 @@ const PART_TYPE_NAMES: Record<string, string> = {
   bracket: '支架',
   gear: '齿轮',
   motor_mount: '电机安装板',
+  bearing_block: '轴承座',
+  flange: '法兰',
+  coupling: '联轴器',
+  shaft_sleeve: '轴套',
 };
 
 interface GenerationResult {
@@ -342,8 +346,10 @@ export default function Home() {
                 {[
                   '做一个轻量化NEMA17电机支架，适配M4螺丝',
                   '创建一个20齿、模数2的标准齿轮',
-                  '设计一个带608轴承孔的高刚性支架',
-                  '做个重型NEMA23电机安装板，材料用PLA',
+                  '设计一个608轴承座，基座安装',
+                  '生成一个外径80的圆法兰，6个螺栓孔',
+                  '做一个内径8的弹性联轴器',
+                  '设计一个带凸缘和键槽的轴套',
                 ].map((example, i) => (
                   <button
                     key={i}
