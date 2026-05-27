@@ -7,6 +7,8 @@ from typing import Optional, Dict, Any
 class GenerateRequest(BaseModel):
     prompt: str
     project_id: Optional[int] = None
+    parameters: Optional[Dict[str, Any]] = None
+    part_type: Optional[str] = None
 
 
 class GenerateResponse(BaseModel):
@@ -38,3 +40,64 @@ class HistoryItem(BaseModel):
 class HistoryResponse(BaseModel):
     items: list[HistoryItem]
     total: int
+
+
+# ============================================================
+# 约束检查
+# ============================================================
+
+class ConstraintCheckRequest(BaseModel):
+    part_type: str
+    params: Dict[str, Any] = {}
+
+
+class ConstraintCheckResponse(BaseModel):
+    valid: bool
+    original_params: Dict[str, Any] = {}
+    fixed_params: Dict[str, Any] = {}
+    issues: list[Dict[str, Any]] = []
+    fixes_applied: list[str] = []
+
+
+# ============================================================
+# 多方案生成
+# ============================================================
+
+class DesignGenerateRequest(BaseModel):
+    part_type: str
+    base_params: Dict[str, Any] = {}
+    requirements: Dict[str, Any] = {}
+
+
+class DesignVariant(BaseModel):
+    design_id: str
+    name: str
+    description: str
+    params: Dict[str, Any] = {}
+    performance: Dict[str, str] = {}
+    constraint_check: Dict[str, Any] = {}
+
+
+class DesignGenerateResponse(BaseModel):
+    part_type: str
+    designs: list[Dict[str, Any]] = []
+    variants: list[DesignVariant] = []
+    comparison: list[Dict[str, Any]] = []
+    recommendation: str = ""
+
+
+# ============================================================
+# 自动装配
+# ============================================================
+
+class AssemblyBuildRequest(BaseModel):
+    parts: list[Dict[str, Any]] = []
+    constraints: list[Dict[str, Any]] = []
+
+
+class AssemblyBuildResponse(BaseModel):
+    valid: bool
+    assembly: Dict[str, Any] = {}
+    code: str = ""
+    alignment: list[Dict[str, Any]] = []
+    constraint_check: Dict[str, Any] = {}

@@ -65,6 +65,11 @@ backend/renders/
 Thumbs.db
 
 # ==========================
+# Static export
+# ==========================
+static_export/
+
+# ==========================
 # Other projects
 # ==========================
 cadlianxi/

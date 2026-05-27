@@ -1,1 +1,1 @@
-export { default as STLViewer } from './STLViewer';
+export { default as STLViewer, MultiPartViewer } from './STLViewer';

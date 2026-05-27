@@ -7,6 +7,8 @@ from build123d import (
     Mode, fillet,
 )
 from .base_part import BasePart, PartParams
+from ..core.models import Anchor
+from ..engineering.assembly.anchors import nema17_mount_anchors
 
 
 @dataclass
@@ -25,6 +27,15 @@ class NEMA17Mount(BasePart):
     def __init__(self, params: NEMA17MountParams):
         super().__init__(params)
         self.params = params
+
+    def get_anchors(self) -> list[Anchor]:
+        return nema17_mount_anchors(
+            base_length=self.params.base_length,
+            base_width=self.params.base_width,
+            mount_height=self.params.mount_height,
+            motor_hole_spacing=self.params.motor_hole_spacing,
+            center_bore=self.params.center_bore,
+        )
 
     def build(self):
         p = self.params

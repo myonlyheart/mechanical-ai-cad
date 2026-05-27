@@ -7,6 +7,8 @@ from build123d import (
     Mode, fillet,
 )
 from .base_part import BasePart, PartParams
+from ..core.models import Anchor
+from ..engineering.assembly.anchors import l_bracket_anchors, t_bracket_anchors
 
 
 @dataclass
@@ -43,6 +45,15 @@ class LBracket(BasePart):
     def __init__(self, params: LBracketParams):
         super().__init__(params)
         self.params = params
+
+    def get_anchors(self) -> list[Anchor]:
+        return l_bracket_anchors(
+            length=self.params.length,
+            width=self.params.width,
+            height=self.params.height,
+            thickness=self.params.thickness,
+            hole_diameter=self.params.hole_diameter,
+        )
 
     def build(self):
         p = self.params
@@ -91,6 +102,15 @@ class TBracket(BasePart):
     def __init__(self, params: TBracketParams):
         super().__init__(params)
         self.params = params
+
+    def get_anchors(self) -> list[Anchor]:
+        return t_bracket_anchors(
+            length=self.params.length,
+            width=self.params.width,
+            height=self.params.height,
+            thickness=self.params.thickness,
+            hole_diameter=self.params.hole_diameter,
+        )
 
     def build(self):
         p = self.params

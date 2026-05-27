@@ -13,4 +13,3 @@ backend/database/*.db
 frontend/node_modules/
 frontend/.next/
 .vercel
-static_export/
