@@ -21,6 +21,7 @@ from ..cad import (
 )
 from ..components.fasteners import Bolt, BoltParams, Nut, NutParams, Washer, WasherParams
 from ..components.shafts import Shaft, ShaftParams
+from ..components.bearings import Bearing, BearingParams
 
 router = APIRouter()
 prompt_engine = PromptEngine()
@@ -168,6 +169,19 @@ params = ShaftParams(
 shaft = Shaft(params)
 part = shaft.build()
 '''
+    elif part_type == "bearing":
+        return f'''from build123d import *
+from components.bearings import Bearing, BearingParams
+
+params = BearingParams(
+    inner_diameter={params.get("inner_diameter", 8)},
+    outer_diameter={params.get("outer_diameter", 22)},
+    width={params.get("width", 7)},
+    bearing_type="{params.get("bearing_type", "deep_groove")}",
+)
+bearing = Bearing(params)
+part = bearing.build()
+'''
     return "# 不支持的零件类型"
 
 
@@ -205,6 +219,9 @@ def build_part(part_type: str, params: dict):
     elif part_type == "shaft":
         p = ShaftParams(**{k: v for k, v in params.items() if hasattr(ShaftParams, k)})
         return Shaft(p).build()
+    elif part_type == "bearing":
+        p = BearingParams(**{k: v for k, v in params.items() if hasattr(BearingParams, k)})
+        return Bearing(p).build()
     raise ValueError(f"不支持的零件类型: {part_type}")
 
 

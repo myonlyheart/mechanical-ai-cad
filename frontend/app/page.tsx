@@ -26,6 +26,7 @@ const PART_TYPE_NAMES: Record<string, string> = {
   nut: '螺母',
   washer: '垫片',
   shaft: '轴',
+  bearing: '轴承',
 };
 
 interface GenerationResult {
@@ -359,6 +360,8 @@ export default function Home() {
                   '设计一个M6法兰螺母',
                   '设计一个直径8mm的键槽轴',
                   '生成一个台阶轴，12-8-6mm三段',
+                  '生成6205深沟球轴承',
+                  '做一个8mm轴径的法兰轴承',
                 ].map((example, i) => (
                   <button
                     key={i}
