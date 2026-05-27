@@ -22,6 +22,7 @@ from ..cad import (
 from ..components.fasteners import Bolt, BoltParams, Nut, NutParams, Washer, WasherParams
 from ..components.shafts import Shaft, ShaftParams
 from ..components.bearings import Bearing, BearingParams
+from ..components.gears import Gear, GearParams
 
 router = APIRouter()
 prompt_engine = PromptEngine()
@@ -44,19 +45,6 @@ params = LBracketParams(
 )
 bracket = LBracket(params)
 part = bracket.build()
-'''
-    elif part_type == "gear":
-        return f'''from build123d import *
-from cad import SpurGear, SpurGearParams
-
-params = SpurGearParams(
-    module={params.get("module", 2)},
-    teeth_count={params.get("teeth_count", 20)},
-    width={params.get("width", 10)},
-    bore_diameter={params.get("bore_diameter", 8)},
-)
-gear = SpurGear(params)
-part = gear.build()
 '''
     elif part_type == "motor_mount":
         return f'''from build123d import *
@@ -182,6 +170,21 @@ params = BearingParams(
 bearing = Bearing(params)
 part = bearing.build()
 '''
+    elif part_type == "gear":
+        return f'''from build123d import *
+from components.gears import Gear, GearParams
+
+params = GearParams(
+    module={params.get("module", 2)},
+    tooth_count={params.get("tooth_count", 20)},
+    face_width={params.get("face_width", 10)},
+    gear_type="{params.get("gear_type", "spur")}",
+    helix_angle={params.get("helix_angle", 0)},
+    bore_diameter={params.get("bore_diameter", 8)},
+)
+gear = Gear(params)
+part = gear.build()
+'''
     return "# 不支持的零件类型"
 
 
@@ -190,8 +193,8 @@ def build_part(part_type: str, params: dict):
         p = LBracketParams(**{k: v for k, v in params.items() if hasattr(LBracketParams, k)})
         return LBracket(p).build()
     elif part_type == "gear":
-        p = SpurGearParams(**{k: v for k, v in params.items() if hasattr(SpurGearParams, k)})
-        return SpurGear(p).build()
+        p = GearParams(**{k: v for k, v in params.items() if hasattr(GearParams, k)})
+        return Gear(p).build()
     elif part_type == "motor_mount":
         p = NEMA17MountParams(**{k: v for k, v in params.items() if hasattr(NEMA17MountParams, k)})
         return NEMA17Mount(p).build()
@@ -684,3 +687,25 @@ async def shaft_fit_endpoint(request: dict):
         return get_gear_fit(shaft_d, request.get("gear_module", 0))
     else:
         return get_shaft_fit(shaft_d, request.get("fit_type", "H7/k6"))
+
+
+# ============================================================
+# 齿轮传动系统
+# ============================================================
+
+@router.post("/gears/drive")
+async def gear_drive_endpoint(request: dict):
+    """自动传动系统设计 API
+
+    请求体: {"target_ratio": 3.0, "module": 2.0, "max_stages": 2}
+    """
+    from ..components.gears import auto_select_gears
+
+    target_ratio = request.get("target_ratio", 1.0)
+    module = request.get("module", 2.0)
+    min_teeth = request.get("min_teeth", 12)
+    max_teeth = request.get("max_teeth", 80)
+    max_stages = request.get("max_stages", 2)
+
+    result = auto_select_gears(target_ratio, module, min_teeth, max_teeth, max_stages)
+    return result.to_dict()

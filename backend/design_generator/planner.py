@@ -110,6 +110,24 @@ DESIGN_STRATEGIES = {
             "time_factor": 1.2,
             "params_override": {"width_factor": 1.5},
         },
+        {
+            "id": "helical",
+            "name": "斜齿轮",
+            "description": "齿面倾斜，运转更平稳安静",
+            "weight_factor": 1.0,
+            "strength_factor": 1.1,
+            "time_factor": 1.3,
+            "params_override": {"gear_type": "helical", "helix_angle": 15},
+        },
+        {
+            "id": "rack",
+            "name": "齿条",
+            "description": "直线齿条，旋转运动转直线运动",
+            "weight_factor": 1.2,
+            "strength_factor": 1.0,
+            "time_factor": 1.1,
+            "params_override": {"gear_type": "rack", "rack_length": 100},
+        },
     ],
     "bearing_block": [
         {
