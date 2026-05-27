@@ -98,6 +98,8 @@ def _generate_part_number(index: int, part_type: str) -> str:
         "tbracket": "BRK",
         "gear": "GAR",
         "spurgear": "GAR",
+        "helical_gear": "GAR",
+        "rack": "GAR",
         "motor_mount": "MTM",
         "nema17mount": "MTM",
         "motor": "MOT",
@@ -112,6 +114,11 @@ def _generate_part_number(index: int, part_type: str) -> str:
         "bolt": "BOL",
         "nut": "NUT",
         "washer": "WSH",
+        "rail": "RAL",
+        "lead_screw": "SCR",
+        "leadscrew": "SCR",
+        "spring": "SPR",
+        "pulley": "PUL",
     }
     prefix = prefix_map.get(part_type.lower(), "PRT")
     return f"{prefix}-{index:03d}"
@@ -124,14 +131,76 @@ def _infer_material(params: dict[str, Any]) -> str:
 
 def _estimate_weight(params: dict[str, Any], part_type: str) -> float:
     """估算重量（简化版）。"""
+    import math
     density = {
         "PLA": 1.24, "ABS": 1.04, "PETG": 1.27,
-        "TPU": 1.2, "Nylon": 1.14, "steel": 7.85,
+        "TPU": 1.2, "Nylon": 1.14, "steel": 7.85, "aluminum": 2.7,
     }
     mat = params.get("material", "PLA")
     d = density.get(mat, 1.24)
 
-    # 简化体积估算
+    ptype = part_type.lower()
+
+    # 齿轮：圆柱体积 - 孔
+    if ptype in ("gear", "spurgear", "helical_gear", "rack"):
+        module = params.get("module", 2)
+        teeth = params.get("tooth_count", params.get("teeth_count", 20))
+        width = params.get("face_width", params.get("width", 10))
+        bore = params.get("bore_diameter", 8)
+        if ptype == "rack":
+            rack_len = params.get("rack_length", 100)
+            volume_cm3 = (rack_len * width * (2.25 * module + module)) / 1000
+        else:
+            outer_r = (module * teeth / 2) + module
+            volume_cm3 = (math.pi * outer_r ** 2 * width - math.pi * (bore / 2) ** 2 * width) / 1000
+        return round(volume_cm3 * d * 0.85, 1)
+
+    # 轴：圆柱体积
+    if ptype in ("shaft",):
+        diameter = params.get("diameter", 8)
+        length = params.get("length", 120)
+        volume_cm3 = (math.pi * (diameter / 2) ** 2 * length) / 1000
+        return round(volume_cm3 * d, 1)
+
+    # 轴承：环形体积
+    if ptype in ("bearing",):
+        od = params.get("outer_diameter", 22)
+        id_ = params.get("inner_diameter", 8)
+        width = params.get("width", 7)
+        volume_cm3 = (math.pi * ((od / 2) ** 2 - (id_ / 2) ** 2) * width) / 1000
+        return round(volume_cm3 * d, 1)
+
+    # 螺栓/螺母/垫片：标准件估算
+    if ptype in ("bolt",):
+        diameter = params.get("diameter", 6)
+        length = params.get("length", 20)
+        volume_cm3 = (math.pi * (diameter / 2) ** 2 * length * 1.3) / 1000  # 含头部
+        return round(volume_cm3 * 7.85, 1)
+    if ptype in ("nut",):
+        diameter = params.get("diameter", 6)
+        return round(diameter * 0.15 + 0.5, 1)  # 经验公式
+    if ptype in ("washer",):
+        od = params.get("outer_diameter", 12)
+        id_ = params.get("inner_diameter", 6.5)
+        return round((math.pi * ((od / 2) ** 2 - (id_ / 2) ** 2) * 1.5) / 1000 * 7.85, 1)
+
+    # 联轴器
+    if ptype in ("coupling",):
+        od = params.get("outer_diameter", 30)
+        length = params.get("length", 40)
+        bore = params.get("bore_diameter", 8)
+        volume_cm3 = (math.pi * ((od / 2) ** 2 - (bore / 2) ** 2) * length) / 1000
+        return round(volume_cm3 * d * 0.7, 1)
+
+    # 法兰：圆盘
+    if ptype in ("flange",):
+        od = params.get("outer_diameter", 80)
+        thickness = params.get("thickness", 8)
+        bore = params.get("bore_diameter", 30)
+        volume_cm3 = (math.pi * ((od / 2) ** 2 - (bore / 2) ** 2) * thickness) / 1000
+        return round(volume_cm3 * d, 1)
+
+    # 通用体积估算
     thickness = params.get("thickness", params.get("base_thickness", 5))
     length = params.get("length", params.get("base_length", params.get("outer_diameter", 60)))
     width = params.get("width", params.get("base_width", params.get("outer_diameter", 40)))
